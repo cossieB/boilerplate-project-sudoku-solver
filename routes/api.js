@@ -37,7 +37,6 @@ module.exports = function (app) {
 
             }
             catch(e) {
-                console.log(e)
                 res.json({error: e.message})
             }
         });

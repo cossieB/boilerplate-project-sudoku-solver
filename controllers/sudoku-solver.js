@@ -58,10 +58,10 @@ class Sudoku {
     }
     check(cellNumber, value) {
         const cell = this.array.find(item => item.cellNumber === cellNumber)
-        
-        const checkColumn = this.array.filter(item => item.column == cell.column).every(item => item.value != value)
-        const checkRow = this.array.filter(item => item.row == cell.row).every(item => item.value != value)
-        const checkRegion = this.array.filter(item => item.region == cell.region).every(item => item.value != value)
+        const filteredArray = this.array.filter(item => item.cellNumber != cellNumber)
+        const checkColumn = filteredArray.filter(item => item.column == cell.column).every(item => item.value != value)
+        const checkRow = filteredArray.filter(item => item.row == cell.row).every(item => item.value != value)
+        const checkRegion = filteredArray.filter(item => item.region == cell.region).every(item => item.value != value)
 
         let arr = []
         !checkColumn && arr.push('column')
@@ -69,22 +69,6 @@ class Sudoku {
         !checkRegion && arr.push('region')
 
         return arr
-    }
-    getCoordinates(cellNumber) {
-        const cell = this.array.find(item => item.cellNumber === cellNumber)
-        return cell
-    }
-    checkColumn(cellNumber) {
-        const {column} = this.getCoordinates(cellNumber)
-        const filteredArray = this.array.filter(item => item.cellNumber === cellNumber)
-    }
-    checkRow(cellNumber) {
-        const {row} = this.getCoordinates(cellNumber)
-        const filteredArray = this.array.filter(item => item.cellNumber === cellNumber)
-    }
-    checkRegion(cellNumber) {
-        const {region} = this.getCoordinates(cellNumber)
-        const filteredArray = this.array.filter(item => item.cellNumber === cellNumber)
     }
     solve() {
         const blanks = this.array.filter(item => !item.frozen)
