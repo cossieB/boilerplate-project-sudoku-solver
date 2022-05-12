@@ -1,18 +1,17 @@
 class Sudoku {
-    puzzleString
-    array
 
     constructor(puzzleString) {
-        if (!this.#validate(puzzleString)) throw new Error('Invalid puzzle')
+        const validation = Sudoku.validate(puzzleString)
+        if (!validation[0]) throw new Error(validation[1])
         this.puzzleString = puzzleString
         this.array = this.getArray()
     }
-    #validate(str) {
-        if (str.length != 81) return false
+    static validate(str) {
+        if (str.length != 81) return [false, 'Expected puzzle to be 81 characters long']
         for (let letter of str) {
-            if (!/[1-9]|\./.test(letter)) return false
+            if (!/[1-9]|\./.test(letter)) return [false, 'Invalid characters in puzzle']
         }
-        return true
+        return [true]
     }
     getArray() {
         let arr = []
@@ -31,7 +30,7 @@ class Sudoku {
             else if (row < 9 && column < 3) region = 6
             else if (row < 9 && column < 6) region = 7
             else region = 8
-
+            
             arr.push({ value, row, column, region, frozen: value !== '.', cellNumber: i })
         }
         return arr
@@ -47,16 +46,45 @@ class Sudoku {
         else {
             num = Number(cell.value) + 1
         }
-
         while (num <= 9) {
             const checkColumn = this.array.filter(item => item.column == cell.column).every(item => item.value != String(num))
             const checkRow = this.array.filter(item => item.row == cell.row).every(item => item.value != String(num))
             const checkRegion = this.array.filter(item => item.region == cell.region).every(item => item.value != String(num))
-
+            
             if (checkColumn && checkRegion && checkRow) return String(num);
             num++
         }
         return '.'
+    }
+    check(cellNumber, value) {
+        const cell = this.array.find(item => item.cellNumber === cellNumber)
+        
+        const checkColumn = this.array.filter(item => item.column == cell.column).every(item => item.value != value)
+        const checkRow = this.array.filter(item => item.row == cell.row).every(item => item.value != value)
+        const checkRegion = this.array.filter(item => item.region == cell.region).every(item => item.value != value)
+
+        let arr = []
+        !checkColumn && arr.push('column')
+        !checkRow && arr.push('row')
+        !checkRegion && arr.push('region')
+
+        return arr
+    }
+    getCoordinates(cellNumber) {
+        const cell = this.array.find(item => item.cellNumber === cellNumber)
+        return cell
+    }
+    checkColumn(cellNumber) {
+        const {column} = this.getCoordinates(cellNumber)
+        const filteredArray = this.array.filter(item => item.cellNumber === cellNumber)
+    }
+    checkRow(cellNumber) {
+        const {row} = this.getCoordinates(cellNumber)
+        const filteredArray = this.array.filter(item => item.cellNumber === cellNumber)
+    }
+    checkRegion(cellNumber) {
+        const {region} = this.getCoordinates(cellNumber)
+        const filteredArray = this.array.filter(item => item.cellNumber === cellNumber)
     }
     solve() {
         const blanks = this.array.filter(item => !item.frozen)
@@ -65,33 +93,18 @@ class Sudoku {
         while (true) {
             let cell = blanks[position];
             let result = this.placeNumber(cell.cellNumber, direction)
-            direction = 1
-            // console.log(position, direction)
-            if (result != '.') {
-                cell.value = result;
-            }
-            if (result == '.') {
-                direction = -1;
-                cell.value = '.'
-            }
+            direction = result === '.' ? -1 : 1
+            cell.value = result
             position += direction;
             if (position < 0 || position >= blanks.length) break
         }
+        let solution = ''
+        this.array.forEach(item => {
+            solution += item.value
+        })
+        if ( solution.includes('.') ) throw new Error('Puzzle cannot be solved')
+        return solution
     }
 }
-
-const puzzle = new Sudoku('..839.7.575.....964..1.......16.29846.9.312.7..754.....62..5.78.8...3.2...492...1')
-
-puzzle.solve()   
-
-const arr = puzzle.array
-let str = ''
-arr.forEach(item => {
-    str += item.value
-})
-
-console.log(str)
-
-
 
 module.exports = Sudoku;
