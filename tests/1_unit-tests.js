@@ -8,28 +8,17 @@ let solver;
 suite('UnitTests', () => {
     test('Valid puzzle', function(done) {
         const input = '1.5..2.84..63.12.7.2..5.....9..1....8.2.3674.3.7.2..9.47...8..1..16....926914.37.'
-        const validate = Solver.validate(input)
-        assert.isArray(validate)
-        assert.equal(validate.length, 1)
-        assert.isTrue(validate[0])
+        assert.isTrue(Solver.validate(input)[0])
         done()
     })
     test('Invalid characters', function(done) {
         const input = 'd.9..5.1.85.4....2432......1...69.83.9.....6.62.71...9......1945....4.37.4.3..6..'
-        const validate = Solver.validate(input)
-        assert.isArray(validate)
-        assert.equal(validate.length, 2)
-        assert.isFalse(validate[0])
-        assert.equal(validate[1], 'Invalid characters in puzzle')
+        assert.isFalse(Solver.validate(input)[0])
         done()
     })
     test('Invalid length 81 characters', function(done) {
         const input = '1945....4.37.4.3..6..'
-        const validate = Solver.validate(input)
-        assert.isArray(validate)
-        assert.equal(validate.length, 2)
-        assert.isFalse(validate[0])
-        assert.equal(validate[1], 'Expected puzzle to be 81 characters long')
+        assert.isFalse(Solver.validate(input)[0])
         done()
     })
     test('valid row placement', function(done) {
